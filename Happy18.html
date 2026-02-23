@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18th Birthday | My Everything 💗</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;500;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --accent: #ff4d94;
+            --gold: #d4af37;
+            --soft-pink: #fff0f5;
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { 
+            margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; 
+            background: var(--soft-pink); color: #333; overflow-x: hidden; scroll-behavior: smooth;
+        }
+
+        /* Heart Trail */
+        .heart-pop { position: absolute; pointer-events: none; animation: floatUp 1s ease-out forwards; z-index: 10000; font-size: 25px; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-120px) scale(2); opacity: 0; } }
+
+        /* Password Section */
+        #pass-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('wallpaper.jpg') no-repeat center center/cover;
+            display: flex; justify-content: center; align-items: center; z-index: 5000;
+            transition: 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+        .pass-box {
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px);
+            padding: 40px; border-radius: 30px; border: 1.5px solid rgba(255,255,255,0.3);
+            text-align: center; color: white; width: 85%; max-width: 400px;
+        }
+        #pin {
+            background: rgba(255,255,255,0.2); border: 1px solid white; color: white;
+            padding: 15px; border-radius: 50px; text-align: center; width: 100%; font-size: 18px; outline: none; margin-bottom: 20px;
+        }
+
+        /* Main Content */
+        #main { display: none; padding-bottom: 60px; text-align: center; }
+        .hero-header { padding: 40px 20px; background: white; border-radius: 0 0 50px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--accent); margin: 0; }
+
+        /* Premium Grid */
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        
+        /* Photo Flip Logic for all 8 photos */
+        .photo-card { height: 230px; perspective: 1000px; cursor: pointer; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .flipped { transform: rotateY(180deg); }
+        .front, .back { 
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
+            border-radius: 20px; border: 4px solid white; box-shadow: 0 8px 15px rgba(0,0,0,0.1); 
+        }
+        .back { 
+            background: white; transform: rotateY(180deg); 
+            display: flex; align-items: center; justify-content: center; padding: 15px;
+            font-family: 'Dancing Script', cursive; font-size: 1.4rem; color: var(--accent);
+            border: 4px solid var(--accent);
+        }
+
+        /* Reasons Section */
+        .premium-reasons {
+            background: white; margin: 30px 20px; padding: 30px; border-radius: 30px;
+            border: 2px solid var(--gold); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.1);
+        }
+        .reason-item { background: var(--soft-pink); margin: 10px 0; padding: 15px; border-radius: 15px; font-weight: 600; color: #d81b60; list-style: none; }
+
+        /* Envelopes */
+        .env {
+            background: white; border-radius: 20px; height: 130px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-bottom: 5px solid var(--accent);
+        }
+
+        /* Cake & Wish */
+        .cake-section { margin: 50px 0; }
+        .flame { width: 15px; height: 25px; background: #ffd700; border-radius: 50%; margin: 0 auto 10px; animation: flicker 0.2s infinite; box-shadow: 0 0 15px orange; }
+        @keyframes flicker { 0% { opacity: 0.9; } 100% { opacity: 1; transform: scale(1.1); } }
+
+        /* Timer */
+        .timer-display { background: var(--accent); color: white; padding: 25px; border-radius: 30px; margin: 25px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 10px 25px rgba(255, 77, 148, 0.3); }
+
+        /* Modal pop up */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 6000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 85%; padding: 40px; border-radius: 30px; text-align: center; font-family: 'Dancing Script'; font-size: 26px; border-top: 8px solid var(--accent); }
+    </style>
+</head>
+<body onclick="spawnHeart(event)">
+
+    <audio id="birthdaySong" loop><source src="music.mp3" type="audio/mpeg"></audio>
+
+    <div id="pass-screen">
+        <div class="pass-box">
+            <h2 style="font-family: 'Playfair Display'; font-style: italic;">Exclusive Access</h2>
+            <p style="font-size: 14px; opacity: 0.8; margin-bottom: 25px;">Enter password my love to unlock 18th birthday surprise...</p>
+            <input type="password" id="pin" placeholder="Password...">
+            <button onclick="unlock()" style="background: var(--accent); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; width: 100%;">Unlock 💗</button>
+        </div>
+    </div>
+
+    <div id="main">
+        <div class="hero-header">
+            <h1 class="hero-title">Happieee Birthday Baccha 💗</h1>
+        </div>
+
+        <div class="grid-container">
+            <div class="env" onclick="openMsg('You are my sun, my moon, and all my stars! ✨')"><span>💌</span><br><b>Open</b></div>
+            <div class="env" onclick="openMsg('To the most beautiful 18-year-old girl in the world! 👑')"><span>💌</span><br><b>Secret</b></div>
+            <div class="env" onclick="openMsg('Every moment with you is a blessing. 🤝')"><span>💌</span><br><b>Read</b></div>
+            <div class="env" onclick="openMsg('I love you more than words can say! 💖')"><span>💌</span><br><b>Love</b></div>
+        </div>
+
+        <div class="premium-reasons">
+            <h2 style="font-family: 'Playfair Display'; color: var(--accent);">Reasons why I love you...</h2>
+            <li class="reason-item">1. Kyuki tum bohoootttttt pyari ho baccha😚</li>
+            <li class="reason-item">2. Kyuki tum sbse best ho baccha 🤭</li>
+            <li class="reason-item">3. Kyuki tum meri bacchi ho 🤭</li>
+            <li class="reason-item">4. Kyuki i love you baccha 💗</li>
+            <li class="reason-item">5. Because it's you baccha my love 💗</li>
+        </div>
+
+        <h2 style="font-family: 'Playfair Display'; margin: 30px 0;">Our Memories (Tap to Flip)</h2>
+        <div class="grid-container">
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo1.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">cute little sexy girl, my love✨</div></div></div>
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo2.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">koi itna pyari kaise lag shakti hai 😍</div></div></div>
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo3.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">sexyy babyy, mai toh tumhara fan hogya </div></div></div>
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo4.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">aisi aadao se toh tum mujhe ghayal kar dogi😊</div></div></div>
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo5.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">hamesha aisehi muskurana baccha 💖</div></div></div>
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo6.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">can i propose you again babyy🌹</div></div></div>
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo7.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">tumhare samne toh 🌙 bhee fika hai </div></div></div>
+            <div class="photo-card" onclick="flip(this)"><div class="card-inner"><div class="front"><img src="photo8.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:15px;"></div><div class="back">My safe place my home</div></div></div>
+        </div>
+
+        <div class="cake-section">
+            <div id="candle" class="flame"></div>
+            <img src="https://img.icons8.com/emoji/160/000000/birthday-cake-emoji.png" width="120">
+            <br>
+            <button id="blowBtn" onclick="blowCandle()" style="margin-top:25px; background:var(--accent); color:white; border:none; padding:15px 35px; border-radius:50px; font-weight:bold; box-shadow: 0 10px 20px rgba(255, 77, 148, 0.2);">Blow & Make a Wish my love🎂</button>
+        </div>
+
+        <div id="surprise" style="display:none; padding: 20px;">
+            <h2 style="font-family: 'Dancing Script'; font-size: 30px; color: var(--accent);">Make a wish baccha! ✨</h2>
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3VxdXphbXN4NHRrdzFscHN0eXZ6N213ZzV4dzFidm9lNGJqaXp6dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/GeimqsH0TLDt4tScGw/giphy.gif" width="180" style="border-radius: 50%;">
+            
+            <div class="timer-display">
+                <span style="font-size: 14px; font-weight: normal; opacity: 0.9;">From Then to Now</span><br>
+                <div id="countdown"></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; margin-top: 30px;">
+                <div class="env" style="width: 90%; height: 160px;" onclick="openMsg('A message for You... <br> Happy birthday baccha,I lobhh uhh bharry much .Tum mereliye bohot special ho baccha kyuki tum hmko ek insan banai hmko pyar ki hmko pyar di aur sbkuch baccha. Hm tumhare jitna perfect toh nahi babyy par hm hamesha kosis krenge ki hm hamesha tumko khus rakhe aur tumhare face se ye pyara sa smile kabhi na hatte .I love you chotki Happy 18th birthday my love')">
+                    <span style="font-size: 50px;">📩</span>
+                    <b>Letter 1</b>
+                </div>
+                <div class="env" style="width: 90%; height: 160px;" onclick="openMsg('kuch baatein... <br> Chotki happy birthday hm tumse zada tumhare liye khus hai baccha kyuki ab tum badi jo ho gayi par rhegi tum meri chotki hi samjhi na toh zada uddna matt huhh. par baccha ab tum sachme badi ho rhi tum hamesha khus rhna baccha aur hamesha muskurate rhna aur sundar toh tum hai hi aur tum aur zada hote jari din par din. Baccha (we are made for each other,never believe anything else) hm chahte ki tumko duniya ka sara khusi mill jai aur tum hamesha khus raho aur tumhara sara dreams fulfill ho I love you baccha till my last breathe')">
+                    <span style="font-size: 50px;">📩</span>
+                    <b>Letter 2</b>
+                </div>
+            </div>
+        </div>
+
+        <p style="padding: 50px 20px; font-family: 'Dancing Script'; font-size: 22px; color: var(--accent); line-height: 1.6;">
+            happy birthday baccha may your wish come true and your life becomes full of joyness, keep smiling my baccha 💗
+        </p>
+    </div>
+
+    <div id="modal" class="modal" onclick="this.style.display='none'">
+        <div class="modal-content" id="mText"></div>
+    </div>
+
+    <script>
+        function unlock() {
+            let p = document.getElementById('pin').value.toLowerCase();
+            if(p === "2328") { // Change password here
+                document.getElementById('pass-screen').style.transform = "translateY(-100%)";
+                document.getElementById('main').style.display = 'block';
+                document.getElementById('birthdaySong').play();
+                celebrate(3);
+            } else { alert("Wrong password, baccha! bhool gayi hamara special number🥺"); }
+        }
+
+        function flip(card) {
+            card.querySelector('.card-inner').classList.toggle('flipped');
+        }
+
+        function spawnHeart(e) {
+            let h = document.createElement('div');
+            h.innerHTML = "💗"; h.className = "heart-pop";
+            h.style.left = e.pageX + "px"; h.style.top = e.pageY + "px";
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 1000);
+        }
+
+        function openMsg(t) {
+            document.getElementById('mText').innerHTML = t + "<br><br><span style='font-size:14px; color:#999'>(Tap to close)</span>";
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function blowCandle() {
+            document.getElementById('candle').style.display = 'none';
+            document.getElementById('blowBtn').style.display = 'none';
+            document.getElementById('surprise').style.display = 'block';
+            celebrate(6);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function celebrate(sec) {
+            let end = Date.now() + (sec * 1000);
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4d94', '#ffd700'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4d94', '#ffd700'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        // Timer (14 Feb 2023)
+        const start = new Date("Feb 14, 2023 00:00:00").getTime();
+        setInterval(() => {
+            let d = new Date().getTime() - start;
+            let days = Math.floor(d / 86400000);
+            let hrs = Math.floor((d % 86400000) / 3600000);
+            let mins = Math.floor((d % 3600000) / 60000);
+            let secs = Math.floor((d % 60000) / 1000);
+            document.getElementById("countdown").innerHTML = `${days}d : ${hrs}h : ${mins}m : ${secs}s`;
+        }, 1000);
+    </script>
+</body>
+</html>
